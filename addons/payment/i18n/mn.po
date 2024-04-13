@@ -1940,7 +1940,7 @@ msgstr "Гүйлгээ буцаалт"
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "Waiting for operations to process"
-msgstr ""
+msgstr "Төлбөрийн гүйлгээ баталгаажилтыг хүлээж байна"
 
 #. module: payment
 #. odoo-python
