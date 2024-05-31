@@ -30029,7 +30029,7 @@ msgstr "提供推送通知和重定向到行動應用程式."
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_edi_proxy_client
 msgid "Proxy features for account_edi"
-msgstr "代理功能於account_edi"
+msgstr "account_edi 代理功能"
 
 #. module: base
 #: model:res.groups,name:base.group_public
@@ -37129,7 +37129,7 @@ msgstr "不能刪除 %s 記錄。"
 msgid ""
 "You cannot delete the admin user because it is utilized in various places "
 "(such as security configurations,...). Instead, archive it."
-msgstr ""
+msgstr "管理員使用者不可刪除，因為它需要在多個地方使用（例如：保安配置等）。請改為將其封存。"
 
 #. module: base
 #. odoo-python

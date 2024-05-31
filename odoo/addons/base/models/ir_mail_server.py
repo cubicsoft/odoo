@@ -141,14 +141,14 @@ class IrMailServer(models.Model):
             else:
                 server.smtp_authentication = False
 
-    @api.constrains('smtp_ssl_certificate', 'smtp_ssl_private_key')
+    @api.constrains('smtp_authentication', 'smtp_ssl_certificate', 'smtp_ssl_private_key')
     def _check_smtp_ssl_files(self):
-        """We must provided both files or none."""
         for mail_server in self:
-            if mail_server.smtp_ssl_certificate and not mail_server.smtp_ssl_private_key:
-                raise UserError(_('SSL private key is missing for %s.', mail_server.name))
-            elif mail_server.smtp_ssl_private_key and not mail_server.smtp_ssl_certificate:
-                raise UserError(_('SSL certificate is missing for %s.', mail_server.name))
+            if mail_server.smtp_authentication == 'certificate':
+                if not mail_server.smtp_ssl_private_key:
+                    raise UserError(_('SSL private key is missing for %s.', mail_server.name))
+                if not mail_server.smtp_ssl_certificate:
+                    raise UserError(_('SSL certificate is missing for %s.', mail_server.name))
 
     def write(self, vals):
         """Ensure we cannot archive a server in-use"""
@@ -332,9 +332,7 @@ class IrMailServer(models.Model):
             smtp_encryption = mail_server.smtp_encryption
             smtp_debug = smtp_debug or mail_server.smtp_debug
             from_filter = mail_server.from_filter
-            if (mail_server.smtp_authentication == "certificate"
-               and mail_server.smtp_ssl_certificate
-               and mail_server.smtp_ssl_private_key):
+            if mail_server.smtp_authentication == "certificate":
                 try:
                     ssl_context = PyOpenSSLContext(ssl.PROTOCOL_TLS)
                     smtp_ssl_certificate = base64.b64decode(mail_server.smtp_ssl_certificate)
@@ -388,7 +386,7 @@ class IrMailServer(models.Model):
                       "You could use STARTTLS instead. "
                        "If SSL is needed, an upgrade to Python 2.6 on the server-side "
                        "should do the trick."))
-            connection = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=SMTP_TIMEOUT)
+            connection = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=SMTP_TIMEOUT, context=ssl_context)
         else:
             connection = smtplib.SMTP(smtp_server, smtp_port, timeout=SMTP_TIMEOUT)
 
