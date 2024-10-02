@@ -768,7 +768,10 @@ class AccountMoveLine(models.Model):
                 tax = record.tax_repartition_line_id.tax_id or record.tax_ids[:1]
                 is_refund = record.is_refund
                 tax_type = tax.type_tax_use
-                record.tax_tag_invert = (tax_type == 'purchase' and is_refund) or (tax_type == 'sale' and not is_refund)
+                if record.display_type == 'epd':  # In case of early payment, tax_tag_invert is independent of the balance of the line
+                    record.tax_tag_invert = tax_type == 'purchase'
+                else:
+                    record.tax_tag_invert = (tax_type == 'purchase' and is_refund) or (tax_type == 'sale' and not is_refund)
             else:
                 # For invoices with taxes
                 record.tax_tag_invert = origin_move_id.is_inbound()
@@ -798,7 +801,11 @@ class AccountMoveLine(models.Model):
     @api.depends('product_id')
     def _compute_product_uom_id(self):
         for line in self:
-            line.product_uom_id = line.product_id.uom_id
+            # vendor bills should have the product purchase UOM
+            if line.move_id.is_purchase_document():
+                line.product_uom_id = line.product_id.uom_po_id
+            else:
+                line.product_uom_id = line.product_id.uom_id
 
     @api.depends('display_type')
     def _compute_quantity(self):
@@ -1113,10 +1120,10 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('product_id')
     def _inverse_product_id(self):
-        self._conditional_add_to_compute('account_id', lambda line: (
-            (self.product_id or not self.account_id) and
-            line.display_type == 'product' and line.move_id.is_invoice(True)
-        ))
+        if self.product_id or not self.account_id:
+            self._conditional_add_to_compute('account_id', lambda line: (
+                line.display_type == 'product' and line.move_id.is_invoice(True)
+            ))
 
     @api.onchange('amount_currency', 'currency_id')
     def _inverse_amount_currency(self):
@@ -1323,7 +1330,7 @@ class AccountMoveLine(models.Model):
         order = (order or self._order) + ', id'
         # Add the domain and order by in order to compute the cumulated balance in _compute_cumulated_balance
         contextualized = self.with_context(
-            domain_cumulated_balance=to_tuple(domain or []),
+            domain_cumulated_balance=to_tuple(self._apply_analytic_distribution_domain(domain or [])),
             order_cumulated_balance=order,
         )
         return super(AccountMoveLine, contextualized).search_read(domain, fields, offset, limit, order)
@@ -1340,7 +1347,7 @@ class AccountMoveLine(models.Model):
     def default_get(self, fields_list):
         defaults = super().default_get(fields_list)
         quick_encode_suggestion = self.env.context.get('quick_encoding_vals')
-        if quick_encode_suggestion:
+        if quick_encode_suggestion and self.env.context.get('default_display_type') not in ('line_section', 'line_note'):
             defaults['account_id'] = quick_encode_suggestion['account_id']
             defaults['price_unit'] = quick_encode_suggestion['price_unit']
             defaults['tax_ids'] = [Command.set(quick_encode_suggestion['tax_ids'])]
