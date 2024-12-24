@@ -549,11 +549,19 @@ var SnippetEditor = Widget.extend({
         if ($parent.closest(':data("snippet-editor")').length) {
             const isEmptyAndRemovable = ($el, editor) => {
                 editor = editor || $el.data('snippet-editor');
-                const isEmpty = $el.text().trim() === ''
+
+                // Consider a <figure> element as empty if it only contains a
+                // <figcaption> element (e.g., when its image has just been
+                // removed).
+                const isEmptyFigureEl = $el[0].matches("figure")
+                    && $el[0].children.length === 1
+                    && $el[0].children[0].matches("figcaption");
+
+                const isEmpty = isEmptyFigureEl || ($el.text().trim() === ''
                     && $el.children().toArray().every(el => {
                         // Consider layout-only elements (like bg-shapes) as empty
                         return el.matches(this.layoutElementsSelector);
-                    });
+                    }));
                 return isEmpty && !$el.hasClass('oe_structure')
                     && !$el.parent().hasClass('carousel-item')
                     && (!editor || editor.isTargetParentEditable)
@@ -2034,7 +2042,7 @@ var SnippetsMenu = Widget.extend({
             // Note: we cannot listen to keyup in .o_default_snippet_text
             // elements via delegation because keyup only bubbles from focusable
             // elements which contenteditable are not.
-            const selection = this.ownerDocument.getSelection();
+            const selection = this.$body[0].ownerDocument.getSelection();
             if (!selection.rangeCount) {
                 return;
             }
@@ -2900,6 +2908,13 @@ var SnippetsMenu = Widget.extend({
         exclude += `${exclude && ', '}.o_snippet_not_selectable`;
 
         let filterFunc = function () {
+            if (forDrop) {
+                // Prevents blocks from being dropped into an image field.
+                const selfOrParentEl = isChildren ? this.parentNode : this;
+                if (selfOrParentEl.closest("[data-oe-type=image]")) {
+                    return false;
+                }
+            }
             // Exclude what it is asked to exclude.
             if ($(this).is(exclude)) {
                 return false;

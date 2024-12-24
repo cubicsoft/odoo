@@ -679,7 +679,7 @@ msgstr "<strong>この見積は取り消されました。</strong>"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
 msgid "<strong>Your Reference:</strong>"
-msgstr "<strong>お客様参照:</strong>"
+msgstr "<strong>参照番号:</strong>"
 
 #. module: sale
 #: model:ir.model.constraint,message:sale.constraint_sale_order_date_order_conditional_required
@@ -1191,7 +1191,7 @@ msgstr "国コード"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_res_config_settings__module_sale_loyalty
 msgid "Coupons & Loyalty"
-msgstr "クーポン＆ロイヤルティ"
+msgstr "クーポン＆ロイヤリティ"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_view_search_inherit_quotation

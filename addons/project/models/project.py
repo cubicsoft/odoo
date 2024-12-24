@@ -632,6 +632,11 @@ class Project(models.Model):
         return projects
 
     def write(self, vals):
+        if vals.get('access_token'):
+            self.ensure_one()  # We are not supposed to add a single access token to multiple project
+            if self.privacy_visibility != 'portal':
+                vals['access_token'] = ''
+
         # directly compute is_favorite to dodge allow write access right
         if 'is_favorite' in vals:
             vals.pop('is_favorite')
@@ -782,7 +787,7 @@ class Project(models.Model):
         favorite_projects.write({'favorite_user_ids': [(3, self.env.uid)]})
 
     def action_view_tasks(self):
-        action = self.env['ir.actions.act_window'].with_context({'active_id': self.id})._for_xml_id('project.act_project_project_2_project_task_all')
+        action = self.env['ir.actions.act_window'].with_context(active_id=self.id)._for_xml_id('project.act_project_project_2_project_task_all')
         action['display_name'] = _("%(name)s", name=self.name)
         context = action['context'].replace('active_id', str(self.id))
         context = ast.literal_eval(context)
@@ -1032,6 +1037,9 @@ class Project(models.Model):
                 portal_users = project.message_partner_ids.user_ids.filtered('share')
                 project.message_unsubscribe(partner_ids=portal_users.partner_id.ids)
                 project.tasks._unsubscribe_portal_users()
+                # revoke access_token since the project and its tasks are no longer accessible for portal/public users
+                project.tasks.access_token = ''
+                project.access_token = ''
 
     # ---------------------------------------------------
     # Project sharing
@@ -2795,14 +2803,14 @@ class ProjectTags(models.Model):
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         if 'project_id' in self.env.context:
-            tag_ids = self._name_search()
+            tag_ids = self._name_search(limit=None)
             domain = expression.AND([domain, [('id', 'in', tag_ids)]])
         return super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
         if 'project_id' in self.env.context:
-            tag_ids = self._name_search()
+            tag_ids = self._name_search(limit=None)
             domain = expression.AND([domain, [('id', 'in', tag_ids)]])
             return self.arrange_tag_list_by_id(super().search_read(domain=domain, fields=fields, offset=offset, limit=limit), tag_ids)
         return super().search_read(domain=domain, fields=fields, offset=offset, limit=limit, order=order)

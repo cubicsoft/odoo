@@ -57,7 +57,7 @@ msgstr "%s的申請"
 #. module: website_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:website_hr_recruitment.default_website_description
 msgid "12 days / year, including <br/>6 of your choice."
-msgstr "12 天/年，包括<br>6 天依你規劃。"
+msgstr "每年 12 天，包括 <br/>6 天由你選擇。"
 
 #. module: website_hr_recruitment
 #: model_terms:ir.ui.view,arch_db:website_hr_recruitment.thankyou_ir_ui_view
@@ -793,7 +793,7 @@ msgstr "此處可撰寫職位描述的簡短描述。該簡短描述將顯示在
 #: code:addons/website_hr_recruitment/static/src/js/website_hr_recruitment_editor.js:0
 #, python-format
 msgid "Your Email"
-msgstr "您的電子信件"
+msgstr "你的電郵"
 
 #. module: website_hr_recruitment
 #. odoo-javascript

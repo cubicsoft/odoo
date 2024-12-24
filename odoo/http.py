@@ -1230,6 +1230,7 @@ class Request:
 
     def _post_init(self):
         self.session, self.db = self._get_session_and_dbname()
+        self._post_init = None
 
     def _get_session_and_dbname(self):
         sid = self.httprequest.cookies.get('session_id')
@@ -1628,6 +1629,7 @@ class Request:
         """
         try:
             self.registry = Registry(self.db).check_signaling()
+            threading.current_thread().dbname = self.registry.db_name
         except (AttributeError, psycopg2.OperationalError, psycopg2.ProgrammingError):
             # psycopg2 error or attribute error while constructing
             # the registry. That means either

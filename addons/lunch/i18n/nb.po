@@ -1379,6 +1379,20 @@ msgid "No cash move yet"
 msgstr ""
 
 #. module: lunch
+#. odoo-javascript
+#: code:addons/lunch/static/src/views/no_content_helper.xml:0
+#, python-format
+msgid "No location found"
+msgstr ""
+
+#. module: lunch
+#. odoo-javascript
+#: code:addons/lunch/static/src/components/lunch_dashboard.xml:0
+#, python-format
+msgid "No lunch location available."
+msgstr ""
+
+#. module: lunch
 #: model_terms:ir.actions.act_window,help:lunch.lunch_order_action_control_suppliers
 msgid "No lunch order yet"
 msgstr ""
@@ -1550,6 +1564,8 @@ msgid ""
 "Payments are used to register liquidity movements. You can process those "
 "payments by your own means or by using installed facilities."
 msgstr ""
+"Betalinger brukes til å registrere likviditetsbevegelser. Du kan behandle "
+"disse betalingene på egenhånd eller ved å bruke installerte fasiliteter."
 
 #. module: lunch
 #: model:ir.model.fields,field_description:lunch.field_lunch_supplier__phone
@@ -1585,6 +1601,13 @@ msgid "Pizza Vegetarian"
 msgstr ""
 
 #. module: lunch
+#. odoo-javascript
+#: code:addons/lunch/static/src/views/no_content_helper.xml:0
+#, python-format
+msgid "Please create a location to start ordering."
+msgstr ""
+
+#. module: lunch
 #: model_terms:lunch.alert,message:lunch.alert_office_3
 msgid "Please order"
 msgstr ""
@@ -1606,7 +1629,7 @@ msgstr "Produkt"
 #. module: lunch
 #: model:ir.model.fields,field_description:lunch.field_lunch_product__is_available_at
 msgid "Product Availability"
-msgstr ""
+msgstr "Produkt tilgjengelighet"
 
 #. module: lunch
 #: model:ir.actions.act_window,name:lunch.lunch_product_category_action
@@ -1709,7 +1732,7 @@ msgstr "Mottakere"
 #. module: lunch
 #: model_terms:ir.actions.act_window,help:lunch.lunch_cashmove_action_payment
 msgid "Register a payment"
-msgstr ""
+msgstr "Registrer betaling"
 
 #. module: lunch
 #: model_terms:ir.ui.view,arch_db:lunch.lunch_order_view_tree
